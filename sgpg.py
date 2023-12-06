@@ -6,7 +6,7 @@ import time
 
 class sgpg:
     """PygameのHSP-ishラッパー「sgpg」クラス
-
+    
     PygameをHSPスタイルで取り扱うためのラッパークラスです
     Python 3.7以下では動作しません
     
@@ -183,6 +183,8 @@ class sgpg:
             なし
         
         """
+        if not (0 <= cls_mode and cls_mode <= 4):
+            raise ValueError
         self.clear()
         self.xpos[self.curw] = 0
         self.ypos[self.curw] = 0
@@ -293,6 +295,8 @@ class sgpg:
             なし
         
         """
+        if noreturn_flag not in [0, 1]:
+            raise ValueError
         for tline in str(message).splitlines():
             t = self.fontobject.render(tline, True, self.colorv)
             #pygame.draw.rect(self.surface, [255,192,192], (self.xpos, self.ypos, t.get_width(), t.get_height()), 0)
@@ -323,6 +327,8 @@ class sgpg:
             なし
         
         """
+        if alignment_value not in ["center", "left"]:
+            raise ValueError
         for av in alignment_value.split():
             if av == "left":
                 self.xalign = 0
@@ -345,6 +351,8 @@ class sgpg:
             なし
         
         """
+        if not (0 <= red and red <= 255 and 0 <= green and green <= 255 and 0 <= blue and blue <= 255 and 0 <= alpha and alpha <= 255):
+            raise ValueError
         self.colorv = [red, green, blue, alpha]
     def rgbcolor(self, rgb: int, alpha: int = 255) -> None:
         """カレントカラーを変更する
@@ -360,6 +368,8 @@ class sgpg:
             なし
         
         """
+        if not (0 <= rgb and rgb <= 16777215 and 0 <= alpha and alpha <= 255):
+            raise ValueError
         self.colorv = [rgb // 65536, rgb % 65536 // 256, rgb % 256, alpha]
     #
     def line(self, x1: int|float, y1: int|float, x2: int|float, y2: int|float, line_width: int = 1) -> None:
