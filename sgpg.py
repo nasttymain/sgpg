@@ -464,14 +464,14 @@ class sgpg:
         """
         self.eventclbk[event_name] = function_pointer
     #
-    def stop(self) -> None:
+    def stop(self, loop_type = 1) -> None:
         """プログラムの実行を止め、イベントループに入る
         
         メインプログラムの実行を中断させ、イベントループを開始します
         この関数の実行が終了するのは、SGPGのウィンドウが閉じられるときです
         
         Args:
-            なし
+            loop_type (int): 無限ループの実行種別s
         
         Returns:
             なし
@@ -479,10 +479,15 @@ class sgpg:
         """
         game_close = 0
         pygame.display.flip()
-        pygame.time.set_timer(25, 16)
+        if loop_type == 1:
+            pygame.time.set_timer(25, 16)
         while game_close == 0:
             pygame.event.pump()
-            for event in [pygame.event.wait()]:
+            if loop_type == 1:
+                evlist = [pygame.event.wait()]
+            elif loop_type == 0:
+                evlist = pygame.event.get()
+            for event in evlist:
                 # ALT + F4
                 if event.type == pygame.locals.QUIT:
                     game_close = 1
@@ -537,6 +542,11 @@ class sgpg:
                         pass
                         #print(event)
             # 1 time for every frame loop
+            if loop_type == 0:
+                if self.eventclbk.get("PG_FRAME") != None:
+                    self.eventclbk["PG_FRAME"]()
+                pygame.display.flip()
+            #
             for pkk in self.pushedkeylist.keys():
                 if time.time_ns() // 1000000 - self.pushedkeylist[pkk]["holdtime"] >= 450:
                     if (time.time_ns() // 1000000 - self.pushedkeylist[pkk]["holdtime"]) // 75 > self.pushedkeylist[pkk]["holdcounter"]:

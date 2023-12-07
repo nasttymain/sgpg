@@ -63,7 +63,7 @@ def gui_init():
     g.debug_uncaught_events = 1
 
 
-    g.stop()
+    g.stop(0)
 
 
 def draw_imetest() -> None:
