@@ -166,6 +166,8 @@ class sgpg:
                     c = [64, 64, 64]
                 t = pygame.font.SysFont("monospace", 13).render(tline, False, c)
                 pygame.draw.rect(self.surface[0], [255, 255, 255], (0, self.logmes_ypos, t.get_width(), t.get_height()), 0)
+                self.pginfo["mesx"] = t.get_width()
+                self.pginfo["mesy"] = t.get_height()
                 self.surface[0].blit(t, (0, self.logmes_ypos))
                 self.logmes_ypos = (self.logmes_ypos + t.get_height()) % self.surface[0].get_height()
                 self.redraw_now()
