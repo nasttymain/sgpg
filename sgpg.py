@@ -376,6 +376,9 @@ class sgpg:
             raise ValueError
         self.colorv = [rgb // 65536, rgb % 65536 // 256, rgb % 256, alpha]
     #
+    def pset(self, x: int|float, y: int|float) -> None:
+        self.surface[self.curw].set_at((x, y), self.colorv)
+    #
     def line(self, x1: int|float, y1: int|float, x2: int|float, y2: int|float, line_width: int = 1) -> None:
         """直線を描画する
         

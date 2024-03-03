@@ -99,7 +99,8 @@ def char(unicode, scancode) -> None:
 
 def tick() -> None:
     g.pos(random.randint(0, 800), random.randint(0, 480))
-    g.text("Hello")
+    #g.text("Hello")
+    g.pset(random.randint(0, 800), random.randint(0, 480))
     pass
 
 if __name__ == "__main__":
