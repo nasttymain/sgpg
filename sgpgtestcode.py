@@ -57,6 +57,7 @@ def gui_init():
 
     g.neweventhandler("PG_MBUTTONDOWN", mbtn)
     g.neweventhandler("PG_KEYDOWN", kdn)
+    g.neweventhandler("PG_KEYUP", kup)
     g.neweventhandler("PG_CHAR", char)
     g.neweventhandler("PG_FRAME", tick)
 
@@ -92,6 +93,9 @@ def kdn(unicode, scancode) -> None:
     g.align("left")
     g.text("Press any key: " + str(a.d["pressedkey"]))
     print("KEYDOWN =>", unicode, scancode)
+
+def kup(unicode, scancode) -> None:
+    print(unicode, scancode)
 
 def char(unicode, scancode) -> None:
     print("char =>", unicode, scancode)

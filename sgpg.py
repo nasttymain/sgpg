@@ -594,6 +594,8 @@ class sgpg:
             self.pushedkeylist.pop(event.dict["scancode"])
         else:
             pass
+        if self.eventclbk.get("PG_KEYUP") != None:
+            self.eventclbk["PG_KEYUP"](event.unicode, event.scancode)
     #
     def _proc_pg_windowresized(self, event):
         self.pginfo["sx"] = self.surface[0].get_width()
