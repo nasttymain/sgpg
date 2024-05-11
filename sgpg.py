@@ -282,6 +282,8 @@ class sgpg:
         else:
             self.fontobject = pygame.font.Font(self.fontfamily, self.fontsize)
     #
+    def mes(self, message: object, noreturn_flag: int = 0) -> None:
+        self.text(message, noreturn_flag)
     def text(self, message: object, noreturn_flag: int = 0) -> None:
         """画面にテキストを描画する
         
