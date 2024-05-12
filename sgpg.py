@@ -20,8 +20,8 @@ class sgpg:
             print("Joystick Initialized: ", self.jstickinfo)
         else:
             self.js = None
-        self.xpos = [0] * 8
-        self.ypos = [0] * 8
+        self.xpos = [0] * 32
+        self.ypos = [0] * 32
         self.fontsize = 16
         self.fontobject = pygame.font.SysFont(None, self.fontsize)
         self.colorv = [0, 0, 0, 255]
@@ -34,10 +34,11 @@ class sgpg:
             "dispy": pygame.display.Info().current_h,
             "act": 0,
             "mesx": 0,
-            "mesy": 0
+            "mesy": 0,
+            "sel": 0,
         }
         self.curw = 0
-        self.surface: list[pygame.SurfaceType|None] = [None] * 8
+        self.surface: list[pygame.SurfaceType|None] = [None] * 32
         self.fontfamily = None
         self.drawlasttime = time.time_ns() // 1000000 
 
@@ -76,7 +77,7 @@ class sgpg:
         """
         return 0.2
     #
-    def screen(self, screen_id: int, xsize: int, ysize: int, window_mode: int = 0) -> int:
+    def screen(self, screen_id: int, xsize: int, ysize: int, window_mode: int = 0) -> None:
         """ウィンドウと描画領域を初期化する
         
         指定されたIDのウィンドウを、指定されたサイズ・モードで初期化し、使用できるようにします。
@@ -91,14 +92,9 @@ class sgpg:
                 +32: サイズ可変ウィンドウ(最大化も可能になります)
                 +64: フルスクリーンウィンドウ
         
-        Returns:
-            int: ステータス
-                0: 成功
-                1: 失敗
-        
         """
         if screen_id != 0:
-            return 1
+            raise NotImplementedError
         option = 0
         if (window_mode & 32) == 32:
             option += pygame.DOUBLEBUF + pygame.RESIZABLE
@@ -110,7 +106,8 @@ class sgpg:
         self.pginfo["sy"] = self.surface[0].get_height()
         self.xshift = 0
         self.yshift = 0
-        return 0
+        self.pginfo["sel"] = 0
+        return
     #
     def ginfo(self, key: str) -> int|str|None:
         """画面関連情報を取得する
@@ -128,12 +125,30 @@ class sgpg:
                 "sy": 現在操作対象となっているウィンドウのYサイズ
                 "dispx": ディスプレイのXサイズ
                 "dispy": ディスプレイのYサイズ
+                "sel"
+                "r"
+                "g"
+                "b"
         
         Returns:
             int|str|None: 各PGINFO情報に対応する値
 
         """
-        if key in self.pginfo:
+        if False:
+            pass
+        elif key == "r":
+            return self.colorv[0]
+        elif key == "g":
+            return self.colorv[1]
+        elif key == "b":
+            return self.colorv[2]
+        elif key == "a":
+            return self.colorv[3]
+        elif key == "sx":
+            return self.surface[self.pginfo["sel"]].get_width()
+        elif key == "sy":
+            return self.surface[self.pginfo["sel"]].get_height()
+        elif key in self.pginfo:
             self.pginfo["cx"] = self.xpos[self.curw]
             self.pginfo["cy"] = self.ypos[self.curw]
             return self.pginfo[key]
@@ -424,6 +439,8 @@ class sgpg:
     def clear(self) -> None:
         pygame.draw.rect(self.surface[self.curw], (255, 255, 255), (0, 0, self.surface[self.curw].get_width(), self.surface[self.curw].get_height()))
     #
+    def boxf(self, x1: int|float = None, y1: int|float = None, x2: int|float = None, y2: int|float = None, round_corner: int = 0) -> None:
+        self.fill(x1, y1, x2, y2, round_corner)
     def fill(self, x1: int|float = None, y1: int|float = None, x2: int|float = None, y2: int|float = None, round_corner: int = 0) -> None:
         """塗りつぶし矩形を描画する
         
@@ -671,7 +688,7 @@ class sgpg:
         elif x < 0 or y < 0:
             pygame.mouse.set_visible(False)
     #
-    def end(self):
+    def end(self) -> None:
         """SGPGを終了する
         
         すべてのウィンドウを閉じてSGPGを終了します。再度同じインスタンスを使用するためには、手動で__init__メソッドを実行する必要があります
@@ -684,3 +701,30 @@ class sgpg:
             
         """
         pygame.quit()
+    def buffer(self, window_id: int, xsize: int|float = 0, ysize: int|float = 0, option: int = 0) -> None:
+        if window_id == 0:
+            raise NotImplementedError
+        self.surface[window_id] = pygame.Surface((xsize, ysize))
+        self.surface[window_id].fill([255,255,255])
+        self.pginfo["sx"] = xsize
+        self.pginfo["sy"] = ysize
+        self.pginfo["sel"] = window_id
+    def picload(self, filename: str) -> None:
+        self.surface[self.pginfo["sel"]] = pygame.image.load(filename)
+        #self.pginfo["sx"] = self.surface[0].get_width()
+        #self.pginfo["sy"] = self.surface[0].get_height()
+    def gsel(self, window_id: int) -> None:
+        self.pginfo["sel"] = window_id
+    def gcopy(self, window_id: int, xpos: int|float, ypos: int|float, xsize: int|float, ysize: int|float) -> None:
+        if self.pginfo["sel"] != 0:
+            raise NotImplementedError
+        self.surface[0].blit(self.surface[window_id], (self.xpos[0], self.ypos[0], xsize, ysize), (xpos, ypos, xsize, ysize))
+    def pget(self,xpos: int|float, ypos: int|float) -> None:
+        c = self.surface[self.pginfo["sel"]].get_at((xpos, ypos))
+        self.colorv[0] = c[0]
+        self.colorv[1] = c[1]
+        self.colorv[2] = c[2]
+        self.colorv[3] = c[3]
+
+
+        
